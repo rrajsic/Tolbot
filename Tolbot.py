@@ -1,11 +1,11 @@
 import backoff
 import requests
 import json
-import getpass
 import urllib.parse
+import os
 
-from requests.auth import HTTPDigestAuth
-from pygerrit2 import GerritRestAPI, HTTPBasicAuth
+import formatter
+import DEBUG_CONSTANTS
 
 
 @backoff.on_exception(backoff.expo, 
@@ -13,19 +13,11 @@ from pygerrit2 import GerritRestAPI, HTTPBasicAuth
                       max_time=10)
 
 def get_change_files(change_id, revision_id, password):
-    # Create an authentication object
-    auth = HTTPBasicAuth('zrajrob', password)
-    # Create a Gerrit REST API client
-    rest = GerritRestAPI(url='***REMOVED***', auth=auth)
-    endpoint = f"/changes/{change_id}/revisions/{revision_id}/files"
+    endpoint = f"/changes/{DEBUG_CONSTANTS.CHANGE_ID}/revisions/{DEBUG_CONSTANTS.REVISION_ID}/files"
     response = rest.get(endpoint)
     return response
 
 def get_file_diff(change_id, revision_id, file_path, password):
-    # Create an authentication object
-    auth = HTTPBasicAuth('zrajrob', password)
-    # Create a Gerrit REST API client
-    rest = GerritRestAPI(url='***REMOVED***', auth=auth)
     encoded_file_path = urllib.parse.quote(file_path, safe='')
     endpoint = f"/changes/{change_id}/revisions/{revision_id}/files/{encoded_file_path}/diff"
     response = rest.get(endpoint)
@@ -34,31 +26,31 @@ def get_file_diff(change_id, revision_id, file_path, password):
 
 def main():
     print("Enter username:")
-    username = getpass.getuser()
-    print("username is", username)
-    password = getpass.getpass(prompt="Enter Windows password: ")
+    print("username is", DEBUG_CONSTANTS.USERNAME)
+    # password = getpass.getpass(prompt="Enter Windows password: ")
     # print("Passoword is: ", password)
-    changeId = input("Enter Change-Id:")
-    REVISION_ID = 'd37bfc9f882b755d3b0dca53a01be8e0a896586d'
+    # changeId = input("Enter Change-Id:")
+   
     try:
-        files = get_change_files(changeId, REVISION_ID, password)
+        files = get_change_files(DEBUG_CONSTANTS.CHANGE_ID, REVISION_ID, DEBUG_CONSTANTS.PASSWORD)
         print(files)
         keys = list(files.keys())
         print(keys) 
-        for file_path in keys[1:]:
-            print(f"Fetching diff for file: {file_path}")
-            diff = get_file_diff(changeId, REVISION_ID, file_path, password)
-            for key, value in diff.items():
-                if key.startswith('content'):
-                    for content in value:
-                        # if 'a' in content:
-                            # print(f"Original: {content['a']}")
-                        if 'b' in content:
-                            print(f"Modified: {content['b']}")
-                        # if 'ab' in content:
-                            # print(f"Common: {content['ab']}")
+        # Open the file with determined mode
+        with open(DEBUG_CONSTANTS.FILENAME, 'w') as file:
+            for file_path in keys:
+                print(f"Fetching diff for file: {file_path}")
+                diff = get_file_diff(DEBUG_CONSTANTS.CHANGE_ID, REVISION_ID, file_path, DEBUG_CONSTANTS.PASSWORD)
+                for key, value in diff.items():
+                    if key.startswith('content'):
+                        for content in value:
+                            if 'b' in content:
+                                for string in content['b']:
+                           
+                                    file.writelines(string + '\n')
     except Exception as e:
         print(f"An error occurred: {e}")
+    formatter.format(DEBUG_CONSTANTS.FILENAME)
 
 if __name__ == "__main__":
     main()

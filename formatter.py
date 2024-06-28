@@ -52,11 +52,18 @@ def remove_prefixes(tests):
         tests[i] = '\n'.join(line.lstrip('%%') for line in tests[i].splitlines())
         tests[i] = '\n'.join(line.lstrip('!') for line in tests[i].splitlines())
         tests[i] = '\n'.join(line.lstrip('-------') for line in tests[i].splitlines())
-    print_tests(tests)
+        lines = tests[i].splitlines()
+        
+        if lines and not lines[0].strip():
+            lines = lines[1:]
+        
+        tests[i] = '\n'.join(lines)
+    return tests
 
 def format(filename):
     print("format called")
     remove_non_test_data(filename)
     tests = split_test_data(filename)
-    remove_prefixes(tests)
+    tests = remove_prefixes(tests)
+    return tests
 

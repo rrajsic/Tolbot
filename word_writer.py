@@ -3,7 +3,6 @@ from docx.shared import Pt
 from docx.enum.text import WD_PARAGRAPH_ALIGNMENT
 
 def create_cover_page(doc):
-
     for i in range(6):
         doc.add_paragraph()
 
@@ -50,7 +49,7 @@ def fill_test_data(doc, tests):
                 test_name_run = test_name_heading.runs[0]
                 test_name_run.font.name = 'Ericsson Hilda ExtraLight'
                 test_name_run.font.size = Pt(18)
-                test_name_heading.paragraph_format.space_after = Pt(5)
+                test_name_heading.paragraph_format.space_after = Pt(10)
 
             else:
                 test_data_heading = doc.add_heading(key, level = 3)

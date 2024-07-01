@@ -4,8 +4,6 @@ import urllib.parse
 import sys
 from pygerrit2 import GerritRestAPI, HTTPBasicAuth
 
-import DEBUG_CONSTANTS
-
 from ..Repository import Repository
 from .Filter import Filter
 from .TestStructureGetter import TestStructureGetter

@@ -19,7 +19,6 @@ class TestStructureGetter:
                     if line:
                         match = re.match(r'^\s*(PREREQUISITES|UPDATE PRECONDITIONS|PURPOSE|TRIGGER|VERIFICATION|TRIGGER \d+|VERIFICATION \d+):', line)
                         if match:
-                            print(line)
                             if current_key:
                                 test_object[current_key] = '\n'.join(current_value).strip()
                             current_key = match.group(1)
@@ -34,10 +33,19 @@ class TestStructureGetter:
 
     def split_test_data(filtered_data):
         filtered_data_string = "\n".join(filtered_data)
-        tests = re.split(r'\n.*-{10,}.*\n', filtered_data_string) 
+        tests = re.split(r'\n.*-{20,}.*\n', filtered_data_string)
+        stripped_tests = []
+
+        for test in tests:
+            lines = test.split('\n')
+            if lines[0].startswith('-' * 20):
+                modified_test = '\n'.join(lines[1:])
+                stripped_tests.append(modified_test)
+            else:
+                stripped_tests.append(test)
 
         split_test_data = []
-        for test in tests:
+        for test in stripped_tests:
             test_stripped = test.strip()
             if test_stripped:
                 split_test_data.append(test_stripped)

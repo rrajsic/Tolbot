@@ -3,6 +3,7 @@ import requests
 import urllib.parse
 import sys
 from pygerrit2 import GerritRestAPI, HTTPBasicAuth
+import json
 
 from ..Repository import Repository
 from .Filter import Filter
@@ -13,13 +14,12 @@ from .TestStructureGetter import TestStructureGetter
                       max_time=10)
 
 class GerritRepository(Repository):
-    server = '***REMOVED***'
-
-    def __init__(self, change_id, revision_id, user):
+ 
+    def __init__(self, server, change_id, revision_id, user):
         self.change_id = change_id
         self.revision_id = revision_id
         auth = HTTPBasicAuth(user['username'], user['password'])
-        self.rest = GerritRestAPI(url=GerritRepository.server, auth=auth)
+        self.rest = GerritRestAPI(url=server, auth=auth)
     
     def get_tests(self):
         unfiltered_data = GerritRepository.get_unfiltered_diff_data(self)
@@ -50,6 +50,8 @@ class GerritRepository(Repository):
             files = GerritRepository.get_change_files(self)
             keys = list(files.keys())
             for file_path in keys:
+                if '/COMMIT_MSG' in file_path:
+                    continue
                 print(f"Fetching diff for file: {file_path}")
                 diff = GerritRepository.get_file_diff(self, file_path)
                 for key, value in diff.items():
@@ -64,4 +66,11 @@ class GerritRepository(Repository):
             sys.exit()
         return unfiltered_data
     
+    def get_repo(self):
+        endpoint = f"/changes/{self.change_id}/revisions/{self.revision_id}/review"
+        response = self.rest.get(endpoint)
+
+        project = response.get('project')
+        return project
+       
 

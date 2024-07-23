@@ -1,25 +1,18 @@
-import backoff
-import requests
 import urllib.parse
 import sys
-from pygerrit2 import GerritRestAPI, HTTPBasicAuth
 import json
 
 from ..Repository import Repository
 from .Filter import Filter
 from .TestStructureGetter import TestStructureGetter
-
-@backoff.on_exception(backoff.expo, 
-                      requests.exceptions.ConnectionError,
-                      max_time=10)
+from connection.gerrit_connection import GerritConnection
 
 class GerritRepository(Repository):
  
-    def __init__(self, server, change_id, revision_id, user):
+    def __init__(self, server, change_id, revision_id, user, connection):
         self.change_id = change_id
         self.revision_id = revision_id
-        auth = HTTPBasicAuth(user['username'], user['password'])
-        self.rest = GerritRestAPI(url=server, auth=auth)
+        self.rest = connection.get_rest()
     
     def get_tests(self):
         unfiltered_data = GerritRepository.get_unfiltered_diff_data(self)

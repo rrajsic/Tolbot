@@ -32,7 +32,9 @@ def main():
     # tests = gtms_repository.get_tests("c629b8b4-5bb0-4b9e-a578-483d7356f15a", user)
 
     ui = UI()
-    ui.run_login()
+    user = ui.run_login()
+
+    print(user)
 
 if __name__ == "__main__":
     main()

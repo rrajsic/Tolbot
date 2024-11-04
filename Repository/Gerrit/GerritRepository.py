@@ -6,13 +6,15 @@ from ..Repository import Repository
 from .Filter import Filter
 from .TestStructureGetter import TestStructureGetter
 from connection.gerrit_connection import GerritConnection
+from pygerrit2 import GerritRestAPI, HTTPBasicAuth
 
 class GerritRepository(Repository):
  
-    def __init__(self, server, change_id, revision_id, user, connection):
+    def __init__(self, server, change_id, revision_id, user):
         self.change_id = change_id
         self.revision_id = revision_id
-        self.rest = connection.get_rest()
+        self.auth = HTTPBasicAuth(user['username'], user['password'])
+        self.rest = GerritRestAPI(url=server, auth=self.auth)
     
     def get_tests(self):
         unfiltered_data = GerritRepository.get_unfiltered_diff_data(self)
@@ -63,7 +65,7 @@ class GerritRepository(Repository):
         endpoint = f"/changes/{self.change_id}/revisions/{self.revision_id}/review"
         response = self.rest.get(endpoint)
 
-        project = response.get('project')
-        return project
+        repo = response.get('project')
+        return repo
        
 

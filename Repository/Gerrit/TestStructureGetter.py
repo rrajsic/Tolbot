@@ -17,7 +17,7 @@ class TestStructureGetter:
                 for line in lines:
                     line = line.rstrip()
                     if line:
-                        match = re.match(r'^\s*(PREREQUISITES|UPDATE PRECONDITIONS|PURPOSE|TRIGGER|VERIFICATION|TRIGGER \d+|VERIFICATION \d+):', line)
+                        match = re.match(r'^\s*(PREREQUISITES|UPDATE PRECONDITIONS|PURPOSE|TRIGGER|VERIFICATION|TRIGGER \d+|VERIFICATION \d+[a-z]*):', line)
                         if match:
                             if current_key:
                                 test_object[current_key] = '\n'.join(current_value).strip()

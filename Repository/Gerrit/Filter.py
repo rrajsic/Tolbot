@@ -10,7 +10,7 @@ class Filter():
 
     def remove_non_test_data(unfiltered_data):
         filtered_data = []
-        filtered_data = [line for line in unfiltered_data if line.strip() == '' or line.strip().startswith('%%')]
+        filtered_data = [line for line in unfiltered_data if line.strip() == '' or line.strip().startswith('%%!')]
 
         return filtered_data
 

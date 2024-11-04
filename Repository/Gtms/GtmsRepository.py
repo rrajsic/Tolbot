@@ -28,7 +28,6 @@ class GtmsRepository(Repository):
     def get_test_case_details(self, test_case_id, headers):
         url = f'***REMOVED***api/tcm/test-cases/{test_case_id}/export'
         response = requests.get(url, headers=headers, verify = self.chain)
-        print(json.dumps(response.json(), indent=4))
         if response.status_code == 200:
             return response.json()
         else:
@@ -59,5 +58,3 @@ class GtmsRepository(Repository):
             tests = []
             for test_case_id in ids:
                 tests.append(GtmsRepository.get_test_case_details(self, test_case_id, headers))
-            # print(tests)
-                

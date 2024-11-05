@@ -1,9 +1,8 @@
 import requests
 import sys
-from tkinter import messagebox, ttk, Canvas
+from tkinter import messagebox, ttk
 from customtkinter import *
 from .login import Login
-from Export.MSWord import MSWord
 from Repository.Gerrit.GerritRepository import GerritRepository
 
 class UI():
@@ -19,7 +18,13 @@ class UI():
         self.root.title("Tolbot")
         self.root.resizable(width=False, height=False)
         self.root.protocol("WM_DELETE_WINDOW", self.on_close)
-
+        
+        self.team_name = ""
+        self.sp_name = ""
+        self.files = []
+        self.tests = []
+        self.repos = []
+        
     def start_main_window(self, user):
         self.user = user
         self.welcome_label = CTkLabel(self.root, text=f"Hi, {self.user['username']}!", font=("Arial", 22))
@@ -44,6 +49,10 @@ class UI():
         export_button.place(relx=0.45, rely=0.95, anchor='center')
 
         self.create_gerrit_widgets()
+
+        self.root.bind('<Return>', self.export)
+        
+        return {"team_name": self.team_name, "sp_name": self.sp_name, "files": self.files, "repos": self.repos, "tests":self.tests}
 
     def create_gerrit_widgets(self):
         server_values = ["***REMOVED***"]
@@ -93,7 +102,7 @@ class UI():
         self.change_id_label_2 = CTkLabel(self.root, text="Change ID:", font=("Arial", 16))
         self.change_id_label_2.place(relx=0.15, rely=0.55, anchor='w')
 
-        self.change_id_entry_2 = CTkEntry(self.root,width = 340, font=("Arial", 16))
+        self.change_id_entry_2 = CTkEntry(self.root,width = 340, font=("Arial", 14))
         self.change_id_entry_2.place(relx=0.3, rely=0.55, anchor='w')
 
         self.revision_id_label_2 = CTkLabel(self.root, text="Revision ID:", font=("Arial", 16))
@@ -133,41 +142,26 @@ class UI():
         self.revision_id_entry_3.place(relx=0.3, rely=0.85, anchor='w')
 
     def initialize_repositories(self, event=None):
-        repository_1 = GerritRepository(self.server_entry_1.get(), self.change_id_entry_1.get(),self.revision_id_entry_1.get(), self.user)
-        self.repositories = [repository_1]
+        self.repositories = [GerritRepository(self.server_entry_1.get(), self.change_id_entry_1.get(),self.revision_id_entry_1.get(), self.user)]
         if self.change_id_entry_2.get() != "":
-            repository_2 = GerritRepository(self.server_entry_2.get(), self.change_id_entry_2.get(),self.revision_id_entry_2.get(), self.user)
-            self.repositories.append(repository_2)
-        if self.change_id_entry_3.get() != "":    
-            repository_3 = GerritRepository(self.server_entry_3.get(), self.change_id_entry_3.get(),self.revision_id_entry_3.get(), self.user)
-            self.repositories.append(repository_3)
+            self.repositories.append(GerritRepository(self.server_entry_2.get(), self.change_id_entry_2.get(),self.revision_id_entry_2.get(), self.user))
+        if self.change_id_entry_3.get() != "":
+            self.repositories.append(GerritRepository(self.server_entry_3.get(), self.change_id_entry_3.get(),self.revision_id_entry_3.get(), self.user))
                 
-    def export(self):
+    def export(self, event=None):
         self.initialize_repositories()
-        suites = []
-        tests = []
-        repos = []
+
         for repository in self.repositories:
-            suites.append(repository.get_change_files())
-            tests.append(repository.get_tests())
-            repos.append(repository.get_repo())
+            self.files.append(repository.get_change_files())
+            self.tests.append(repository.get_tests())
+            self.repos.append(repository.get_repo())
 
-        team_name = self.team_name_entry.get()
-        sp_name = self.sp_name_entry.get()
-        ms_word = MSWord(sp_name, team_name)
-        ms_word.create_statistic_page(suites, tests)
-        for repo, test in zip(repos, tests):
-            ms_word.fill_test_data(repo, test)
+        self.team_name = self.team_name_entry.get()
+        self.sp_name = self.sp_name_entry.get()
 
-        ms_word.save(sp_name)
+        self.root.quit()
 
-        self.root.destroy()
-
-    def start_import_window(self):
-        self.repositories = self.run_gerrit_form_ui(self.user)
-        
-
-    def run_login(self):
+    def run(self):
         while True:
             self.login = Login(self.root)
             connection = self.login.get_login()
@@ -184,6 +178,15 @@ class UI():
                 
         self.user = connection.user
         self.start_main_window(self.user)
+        self.root.mainloop()
+
+        return {
+            "team_name": self.team_name,
+            "sp_name": self.sp_name,
+            "files": self.files,
+            "repos": self.repos,
+            "tests": self.tests
+        }
 
 
     def on_close(self):

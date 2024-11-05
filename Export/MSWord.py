@@ -124,4 +124,5 @@ class MSWord():
                     test_text_run = test_text.add_run(value)
                     test_text_run.font.size = Pt(10)
                     test_text_run.font.name="Ericsson Hilda"
+                    
             self.doc.add_page_break()

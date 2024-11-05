@@ -1,14 +1,17 @@
 import docx
 from docx.shared import Pt
 from docx.enum.text import WD_PARAGRAPH_ALIGNMENT
+from docx.oxml import parse_xml
+from docx.oxml.ns import nsdecls
 
 class MSWord():
     def __init__(self, sp_name, team_name):
         self.doc = docx.Document()
         MSWord.create_cover_page(self, sp_name, team_name)
 
-    def save(self):
-        self.doc.save("Demo TOL.docx")
+    def save(self, sp_name):
+        tol_name = sp_name + "_TOL.docx"
+        self.doc.save(tol_name)
 
     def create_cover_page(self, sp_name, team_name):
         for i in range(6):
@@ -42,9 +45,18 @@ class MSWord():
         footnote.alignment = WD_PARAGRAPH_ALIGNMENT.RIGHT
         footnote_run.font.name="Ericsson Hilda Mono ExtraLight"
 
+    def count_elements(self,test_list):
+        count = 0
+        for i in test_list:
+            if isinstance(i, list):
+                count += self.count_elements(i)
+            else:
+                count +=1
+        return count
+
     def create_statistic_page(self, suites, tests):
         test_count = self.doc.add_paragraph()
-        test_count_run = test_count.add_run(f"Total test count: {len(tests)}")
+        test_count_run = test_count.add_run(f"Total test count: {self.count_elements(tests)}")
         test_count_run.font.size = Pt(16)
         test_count.alignment = WD_PARAGRAPH_ALIGNMENT.LEFT
         test_count_run.font.name="Ericsson Capital TT"
@@ -59,16 +71,26 @@ class MSWord():
         table_title_run.font.italic = True
         table_title.paragraph_format.space_after = Pt(10)
 
-        files = list(suites.keys())
         suite_names = []
-        for suite_name in files:
-            if '/COMMIT_MSG' in suite_name:
-                continue
-            suite_names.append(suite_name)
-
+        for repo_names in suites:
+            for suite_name in repo_names:
+                if '/COMMIT_MSG' in suite_name:
+                    continue
+                suite_names.append(suite_name)
         suites_table = self.doc.add_table(rows=len(suite_names),cols=1)
         for i, row_data in enumerate(suite_names):
-            suites_table.cell(i,0).text = row_data
+            cell = suites_table.cell(i, 0)
+            cell.text = row_data
+            cell_element = cell._element
+            tcPr = cell_element.get_or_add_tcPr()
+            borders = parse_xml(
+                r'<w:tcBorders ' + nsdecls('w') +
+                r'><w:top w:val="single" w:sz="4"/>' +
+                r'<w:left w:val="single" w:sz="4"/>' +
+                r'<w:bottom w:val="single" w:sz="4"/>' +
+                r'<w:right w:val="single" w:sz="4"/></w:tcBorders>'
+            )
+            tcPr.append(borders)
 
         self.doc.add_page_break()
 

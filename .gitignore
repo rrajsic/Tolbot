@@ -1,0 +1,6 @@
+__pycache__/
+*DEBUG_CONSTANTS.py
+*.docx
+*.spec
+build/
+dist/

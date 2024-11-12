@@ -1,5 +1,3 @@
-import re
-
 class Filter():
 
     def filter_data(self, unfiltered_data):

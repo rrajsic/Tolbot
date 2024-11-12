@@ -21,5 +21,5 @@ class GerritConnection():
             response = self.rest.get('/config/server/version')
             print("Authentication successful")
             print(f"Gerrit server version: {response}")  
-        except Exception as err:
+        except Exception:
             raise

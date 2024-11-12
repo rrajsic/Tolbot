@@ -1,11 +1,9 @@
 import urllib.parse
 import sys
-import json
 
 from ..Repository import Repository
 from .Filter import Filter
 from .TestStructureGetter import TestStructureGetter
-from connection.gerrit_connection import GerritConnection
 from pygerrit2 import GerritRestAPI, HTTPBasicAuth
 
 class GerritRepository(Repository):

@@ -1,16 +1,19 @@
 from UI.main_window import UI
 from export.ms_word import MSWord
+from json_handler import JSONHandler
 
 def main():
-    ui = UI()
-    data = ui.run()
+    json_handler = JSONHandler("test_data.json")
+    ui = UI(json_handler)
+    ui.run()
 
-    ms_word = MSWord(data["sp_name"], data["team_name"])
-    ms_word.create_statistic_page(data["files"], data["tests"])
-    for repo, test in zip(data["repos"], data["tests"]):
-        ms_word.fill_test_data(repo, test)
+    ms_word = MSWord(json_handler)
 
-    ms_word.save(data["sp_name"])
+    try:
+        ms_word.export()
+        ui.notify("TOL successfully exported")
+    except Exception as e:
+        ui.notify(e)
 
 if __name__ == "__main__":
     main()

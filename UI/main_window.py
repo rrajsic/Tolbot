@@ -3,13 +3,15 @@ import sys
 from tkinter import messagebox, ttk
 from customtkinter import *
 from .login_window import LoginUI
-from Repository.Gerrit.GerritRepository import GerritRepository
+from repository.gerrit.GerritRepository import GerritRepository
+from json_handler import JSONHandler
 
 class UI():
-    def __init__(self):
+    def __init__(self, json_handler):
         self.login = None
         self.gerrit_ui = None
-    
+
+        self.json_handler = json_handler
         self.repositories = None
         
         self.root = CTk()
@@ -20,7 +22,7 @@ class UI():
         self.root.protocol("WM_DELETE_WINDOW", self.on_close)
         
         self.team_name = ""
-        self.sp_name = ""
+        self.project_name = ""
         self.files = []
         self.tests = []
         self.repos = []
@@ -36,11 +38,11 @@ class UI():
         self.team_name_entry = CTkEntry(self.root, font=("Arial", 16))
         self.team_name_entry.place(relx=0.45, rely=0.05, anchor='w')
 
-        self.sp_name_label = CTkLabel(self.root, text="SP name:", font=("Arial", 16))
-        self.sp_name_label.place(relx=0.3, rely=0.1, anchor='w')
+        self.project_name_label = CTkLabel(self.root, text="SP name:", font=("Arial", 16))
+        self.project_name_label.place(relx=0.3, rely=0.1, anchor='w')
 
-        self.sp_name_entry = CTkEntry(self.root, font=("Arial", 16))
-        self.sp_name_entry.place(relx=0.45, rely=0.1, anchor='w')
+        self.project_name_entry = CTkEntry(self.root, font=("Arial", 16))
+        self.project_name_entry.place(relx=0.45, rely=0.1, anchor='w')
 
         self.separator_1 = ttk.Separator(self.root, orient='horizontal')
         self.separator_1.place(relx=0.5, rely=0.15, anchor='center', relwidth=0.8)
@@ -52,7 +54,7 @@ class UI():
 
         self.root.bind('<Return>', self.export)
         
-        return {"team_name": self.team_name, "sp_name": self.sp_name, "files": self.files, "repos": self.repos, "tests":self.tests}
+        {"team_name": self.team_name, "project_name": self.project_name, "files": self.files, "repos": self.repos, "tests":self.tests}
 
     def create_gerrit_widgets(self):
         server_values = ["***REMOVED***"]
@@ -157,7 +159,7 @@ class UI():
             self.repos.append(repository.get_repo())
 
         self.team_name = self.team_name_entry.get()
-        self.sp_name = self.sp_name_entry.get()
+        self.project_name = self.project_name_entry.get()
 
         self.root.quit()
 
@@ -174,26 +176,25 @@ class UI():
                     connection.connect()
                     break
                 except Exception as err:
-                    self.show_exception(err)
+                    self.notify_login_exception(err)
                 
         self.user = connection.user
         self.start_main_window(self.user)
         self.root.mainloop()
 
-        return {
+        self.json_handler.export_to_json({
             "team_name": self.team_name,
-            "sp_name": self.sp_name,
+            "project_name": self.project_name,
             "files": self.files,
             "repos": self.repos,
             "tests": self.tests
-        }
-
+        })
 
     def on_close(self):
         self.root.destroy()
         sys.exit()
     
-    def show_exception(self,err):
+    def notify_login_exception(self,err):
         if isinstance(err, requests.exceptions.HTTPError):
             messagebox.showerror("LoginUI Failed", f"HTTP error occurred: {err}")
         elif isinstance(err, requests.exceptions.ConnectionError):
@@ -205,6 +206,11 @@ class UI():
         else:
             messagebox.showerror("LoginUI Failed", f"An unexpected error occurred: {err}")
 
-        
+    def notify(self, message):
+        if isinstance(message, Exception):
+            messagebox.showerror("Error",f"An error occured: {message}")
+        else:
+            messagebox.showinfo("Info", message)
+
 
         

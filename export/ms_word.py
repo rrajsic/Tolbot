@@ -3,25 +3,28 @@ from docx.shared import Pt
 from docx.enum.text import WD_PARAGRAPH_ALIGNMENT
 from docx.oxml import parse_xml
 from docx.oxml.ns import nsdecls
+from json_handler import JSONHandler
 
 class MSWord():
-    def __init__(self, sp_name, team_name):
-        self.doc = docx.Document()
-        MSWord.create_cover_page(self, sp_name, team_name)
+    def __init__(self, json_handler):
+        self.json_handler = json_handler
 
-    def save(self, sp_name):
-        tol_name = sp_name + "_TOL.docx"
+        self.doc = docx.Document()
+        self.data = json_handler.import_from_json()
+
+    def save(self, project_name):
+        tol_name = project_name + "_TOL.docx"
         self.doc.save(tol_name)
 
-    def create_cover_page(self, sp_name, team_name):
+    def create_cover_page(self, project_name, team_name):
         for i in range(6):
             self.doc.add_paragraph()
 
-        sp_name_par = self.doc.add_paragraph()
-        sp_name_run = sp_name_par.add_run(sp_name)
-        sp_name_run.font.size = Pt(16)
-        sp_name_par.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
-        sp_name_run.font.name="Cambria"
+        project_name_par = self.doc.add_paragraph()
+        project_name_run = project_name_par.add_run(project_name)
+        project_name_run.font.size = Pt(16)
+        project_name_par.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
+        project_name_run.font.name="Cambria"
 
         title = self.doc.add_paragraph()
         title_run = title.add_run("TOL")
@@ -64,7 +67,7 @@ class MSWord():
         self.doc.add_paragraph()
         self.doc.add_paragraph()
 
-        table_title = self.doc.add_heading("MCT Suites Impacted", level=1)
+        table_title = self.doc.add_heading("Files Impacted", level=1)
         table_title_run = table_title.runs[0]
         table_title_run.font.size = Pt(18)
         table_title_run.font.name="Ericsson Hilda"
@@ -95,6 +98,7 @@ class MSWord():
         self.doc.add_page_break()
 
     def fill_test_data(self, repo, tests):
+
         repo_name_heading = self.doc.add_heading(repo, level=1)
         repo_name_run = repo_name_heading.runs[0]
         repo_name_run.font.name = 'Ericsson Hilda'
@@ -126,3 +130,11 @@ class MSWord():
                     test_text_run.font.name="Ericsson Hilda"
                     
             self.doc.add_page_break()
+
+    def export(self):
+        self.create_cover_page(self.data['project_name'], self.data['team_name'])
+        self.create_statistic_page(self.data["files"], self.data["tests"])
+
+        for repo, test in zip(self.data["repos"], self.data["tests"]):
+            self.fill_test_data(repo, test)
+        return self.save(self.data["project_name"])

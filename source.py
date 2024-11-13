@@ -7,7 +7,7 @@ from repository.gerrit.gerrit_repository_factory import GerritRepositoryFactory
 def main():
     json_handler = JSONHandler("test_data.json")
 
-    ui = TkinterUI(json_handler, GerritRepositoryFactory(["***REMOVED***","silver spoon in hand"]))
+    ui = TkinterUI(json_handler, GerritRepositoryFactory(["***REMOVED***"]))
     ui.run()
 
     exporter = MSWord(json_handler)

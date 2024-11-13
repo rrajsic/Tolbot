@@ -97,9 +97,6 @@ class TkinterUI(UI):
         self.number_label_2 = CTkLabel(self.root, text="2", font=("Arial", 18))
         self.number_label_2.place(relx=0.05, rely=0.45, anchor='w')
 
-        self.optional_label = CTkLabel(self.root, text="(optional)", font=("Arial", 12, "italic"))
-        self.optional_label.place(relx=0.08, rely=0.45, anchor='w')
-
         self.server_label_2 = CTkLabel(self.root, text="Server:", font=("Arial", 16))
         self.server_label_2.place(relx=0.15, rely=0.5, anchor='w')
 
@@ -127,9 +124,6 @@ class TkinterUI(UI):
 
         self.number_label_3 = CTkLabel(self.root, text="3", font=("Arial", 18))
         self.number_label_3.place(relx=0.05, rely=0.7, anchor='w')
-
-        self.optional_label = CTkLabel(self.root, text="(optional)", font=("Arial", 12, "italic"))
-        self.optional_label.place(relx=0.08, rely=0.7, anchor='w')
 
         self.server_label_3 = CTkLabel(self.root, text="Server:", font=("Arial", 16))
         self.server_label_3.place(relx=0.15, rely=0.75, anchor='w')

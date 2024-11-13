@@ -4,8 +4,9 @@ from docx.enum.text import WD_PARAGRAPH_ALIGNMENT
 from docx.oxml import parse_xml
 from docx.oxml.ns import nsdecls
 from json_handler import JSONHandler
+from ..exporter import Exporter
 
-class MSWord():
+class MSWord(Exporter):
     def __init__(self, json_handler):
         self.json_handler = json_handler
 
@@ -26,7 +27,7 @@ class MSWord():
         project_name_par.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
         project_name_run.font.name="Cambria"
 
-        title = self.doc.add_paragraph()
+        title = self.doc.add_heading()
         title_run = title.add_run("TOL")
         title_run.font.size = Pt(66)
         title_run.bold = True
@@ -58,7 +59,7 @@ class MSWord():
         return count
 
     def create_statistic_page(self, suites, tests):
-        test_count = self.doc.add_paragraph()
+        test_count = self.doc.add_heading()
         test_count_run = test_count.add_run(f"Total test count: {self.count_elements(tests)}")
         test_count_run.font.size = Pt(16)
         test_count.alignment = WD_PARAGRAPH_ALIGNMENT.LEFT

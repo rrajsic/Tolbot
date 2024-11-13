@@ -1,10 +1,10 @@
 import re
 
-class TestStructureGetter:
+class Filter:
 
     def get_structurized_tests_from_data(self, filtered_test_data):
         structurized_tests = []
-        filtered_tests = TestStructureGetter.split_test_data(filtered_test_data)
+        filtered_tests = self.split_test_data(filtered_test_data)
         for test in filtered_tests:
                 test_object = {}
                 current_key = None
@@ -31,7 +31,7 @@ class TestStructureGetter:
 
         return structurized_tests
 
-    def split_test_data(filtered_data):
+    def split_test_data(self, filtered_data):
         filtered_data_string = "\n".join(filtered_data)
         tests = re.split(r'\n.*-{20,}.*\n', filtered_data_string)
         stripped_tests = []
@@ -51,3 +51,21 @@ class TestStructureGetter:
                 split_test_data.append(test_stripped)
 
         return split_test_data
+
+    def remove_non_test_data(self, unfiltered_data):
+        filtered_data = []
+        filtered_data = [line for line in unfiltered_data if line.strip() == '' or line.strip().startswith('%%!')]
+
+        return filtered_data
+
+    def remove_prefixes(self, tests):
+        for i in range(len(tests)):
+            tests[i] = '\n'.join(line.lstrip('%%') for line in tests[i].splitlines())
+            tests[i] = '\n'.join(line.lstrip('!') for line in tests[i].splitlines())
+            lines = tests[i].splitlines()
+            
+            if lines and not lines[0].strip():
+                lines = lines[1:]
+            tests[i] = '\n'.join(lines)
+
+        return tests

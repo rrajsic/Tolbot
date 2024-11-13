@@ -3,16 +3,17 @@ import sys
 from tkinter import messagebox, ttk
 from customtkinter import *
 from .login_window import LoginUI
-from repository.gerrit.GerritRepository import GerritRepository
+from repository.repository_factory import RepositoryFactory
 from json_handler import JSONHandler
+from ..ui import UI
 
-class UI():
-    def __init__(self, json_handler):
+class TkinterUI(UI):
+    def __init__(self, json_handler, repository_factory: RepositoryFactory):
         self.login = None
         self.gerrit_ui = None
 
         self.json_handler = json_handler
-        self.repositories = None
+        self.repository_factory = repository_factory
         
         self.root = CTk()
         screen_height = self.root.winfo_screenheight()
@@ -57,7 +58,11 @@ class UI():
         {"team_name": self.team_name, "project_name": self.project_name, "files": self.files, "repos": self.repos, "tests":self.tests}
 
     def create_gerrit_widgets(self):
-        server_values = ["***REMOVED***"]
+        server_values = self.repository_factory.get_servers()
+
+        self.change_id_entry = [None, None, None]
+        self.revision_id_entry = [None, None, None]
+        self.server_entry = [None, None, None]
 
         # First repository info
 
@@ -67,21 +72,22 @@ class UI():
         self.server_label_1 = CTkLabel(self.root, text="Server:", font=("Arial", 16))
         self.server_label_1.place(relx=0.15, rely=0.25, anchor='w')
 
-        self.server_entry_1 =  CTkComboBox(self.root, values=server_values, width = 300, font=("Arial", 14))
-        self.server_entry_1.set(server_values[0])
-        self.server_entry_1.place(relx=0.3, rely=0.25, anchor='w')
+        self.server_entry[0] =  CTkComboBox(self.root, values=server_values, width = 300, font=("Arial", 14))
+        if server_values:
+            self.server_entry[0].set(server_values[0])
+        self.server_entry[0].place(relx=0.3, rely=0.25, anchor='w')
 
         self.change_id_label_1 = CTkLabel(self.root, text="Change ID:", font=("Arial", 16))
         self.change_id_label_1.place(relx=0.15, rely=0.3, anchor='w')
 
-        self.change_id_entry_1 = CTkEntry(self.root,  width = 340, font=("Arial", 14))
-        self.change_id_entry_1.place(relx=0.3, rely=0.3, anchor='w')
+        self.change_id_entry[0] = CTkEntry(self.root,  width = 340, font=("Arial", 14))
+        self.change_id_entry[0].place(relx=0.3, rely=0.3, anchor='w')
 
         self.revision_id_label_1 = CTkLabel(self.root, text="Revision ID:", font=("Arial", 16))
         self.revision_id_label_1.place(relx=0.15, rely=0.35, anchor='w')
 
-        self.revision_id_entry_1 = CTkEntry(self.root,  width = 340, font=("Arial", 14))
-        self.revision_id_entry_1.place(relx=0.3, rely=0.35, anchor='w')
+        self.revision_id_entry[0] = CTkEntry(self.root,  width = 340, font=("Arial", 14))
+        self.revision_id_entry[0].place(relx=0.3, rely=0.35, anchor='w')
 
         self.separator_1 = ttk.Separator(self.root, orient='horizontal')
         self.separator_1.place(relx=0.5, rely=0.4, anchor='center', relwidth=0.8)
@@ -97,21 +103,22 @@ class UI():
         self.server_label_2 = CTkLabel(self.root, text="Server:", font=("Arial", 16))
         self.server_label_2.place(relx=0.15, rely=0.5, anchor='w')
 
-        self.server_entry_2 =  CTkComboBox(self.root, values=server_values,  width = 300, font=("Arial", 14))
-        self.server_entry_2.set(server_values[0])
-        self.server_entry_2.place(relx=0.3, rely=0.5, anchor='w')
+        self.server_entry[1] = CTkComboBox(self.root, values=server_values,  width = 300, font=("Arial", 14))
+        if server_values:
+            self.server_entry[1].set(server_values[0])
+        self.server_entry[1].place(relx=0.3, rely=0.5, anchor='w')
 
         self.change_id_label_2 = CTkLabel(self.root, text="Change ID:", font=("Arial", 16))
         self.change_id_label_2.place(relx=0.15, rely=0.55, anchor='w')
 
-        self.change_id_entry_2 = CTkEntry(self.root,width = 340, font=("Arial", 14))
-        self.change_id_entry_2.place(relx=0.3, rely=0.55, anchor='w')
+        self.change_id_entry[1] = CTkEntry(self.root,width = 340, font=("Arial", 14))
+        self.change_id_entry[1].place(relx=0.3, rely=0.55, anchor='w')
 
         self.revision_id_label_2 = CTkLabel(self.root, text="Revision ID:", font=("Arial", 16))
         self.revision_id_label_2.place(relx=0.15, rely=0.6, anchor='w')
 
-        self.revision_id_entry_2 = CTkEntry(self.root,width = 340, font=("Arial", 14))
-        self.revision_id_entry_2.place(relx=0.3, rely=0.6, anchor='w')
+        self.revision_id_entry[1] = CTkEntry(self.root,width = 340, font=("Arial", 14))
+        self.revision_id_entry[1].place(relx=0.3, rely=0.6, anchor='w')
 
         self.separator_2 = ttk.Separator(self.root, orient='horizontal')
         self.separator_2.place(relx=0.5, rely=0.65, anchor='center', relwidth=0.8)
@@ -127,36 +134,34 @@ class UI():
         self.server_label_3 = CTkLabel(self.root, text="Server:", font=("Arial", 16))
         self.server_label_3.place(relx=0.15, rely=0.75, anchor='w')
 
-        self.server_entry_3 =  CTkComboBox(self.root, values=server_values, width = 300, font=("Arial", 14))
-        self.server_entry_3.set(server_values[0])
-        self.server_entry_3.place(relx=0.3, rely=0.75, anchor='w')
+        self.server_entry[2] = CTkComboBox(self.root, values=server_values, width = 300, font=("Arial", 14))
+        if server_values:
+            self.server_entry[2].set(server_values[0])
+        self.server_entry[2].place(relx=0.3, rely=0.75, anchor='w')
 
         self.change_id_label_3 = CTkLabel(self.root, text="Change ID:", font=("Arial", 16))
         self.change_id_label_3.place(relx=0.15, rely=0.8, anchor='w')
 
-        self.change_id_entry_3 = CTkEntry(self.root,width = 340, font=("Arial", 14))
-        self.change_id_entry_3.place(relx=0.3, rely=0.8, anchor='w')
+        self.change_id_entry[2] = CTkEntry(self.root,width = 340, font=("Arial", 14))
+        self.change_id_entry[2].place(relx=0.3, rely=0.8, anchor='w')
 
         self.revision_id_label_3 = CTkLabel(self.root, text="Revision ID:", font=("Arial", 16))
         self.revision_id_label_3.place(relx=0.15, rely=0.85, anchor='w')
 
-        self.revision_id_entry_3 = CTkEntry(self.root,width = 340, font=("Arial", 14))
-        self.revision_id_entry_3.place(relx=0.3, rely=0.85, anchor='w')
-
-    def initialize_repositories(self, event=None):
-        self.repositories = [GerritRepository(self.server_entry_1.get(), self.change_id_entry_1.get(),self.revision_id_entry_1.get(), self.user)]
-        if self.change_id_entry_2.get() != "":
-            self.repositories.append(GerritRepository(self.server_entry_2.get(), self.change_id_entry_2.get(),self.revision_id_entry_2.get(), self.user))
-        if self.change_id_entry_3.get() != "":
-            self.repositories.append(GerritRepository(self.server_entry_3.get(), self.change_id_entry_3.get(),self.revision_id_entry_3.get(), self.user))
+        self.revision_id_entry[2] = CTkEntry(self.root,width = 340, font=("Arial", 14))
+        self.revision_id_entry[2].place(relx=0.3, rely=0.85, anchor='w')
                 
     def export(self, event=None):
-        self.initialize_repositories()
+        repositories = [None, None, None]
+        for i in range(3):   
+            if self.change_id_entry[i].get() != "": 
+                repositories[i] = self.repository_factory.create_repository(self.server_entry[i].get(), self.change_id_entry[i].get(),self.revision_id_entry[i].get(), self.user)
 
-        for repository in self.repositories:
-            self.files.append(repository.get_change_files())
-            self.tests.append(repository.get_tests())
-            self.repos.append(repository.get_repo())
+        for repository in repositories:
+            if repository != None:
+                self.files.append(repository.get_change_files())
+                self.tests.append(repository.get_tests())
+                self.repos.append(repository.get_repo())
 
         self.team_name = self.team_name_entry.get()
         self.project_name = self.project_name_entry.get()

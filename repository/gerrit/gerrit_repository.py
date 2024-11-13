@@ -1,25 +1,26 @@
 import urllib.parse
 import sys
 
-from ..Repository import Repository
-from .Filter import Filter
-from .TestStructureGetter import TestStructureGetter
+from ..repository import Repository
+from .filter import Filter
+from .filter import Filter
 from pygerrit2 import GerritRestAPI, HTTPBasicAuth
 
 class GerritRepository(Repository):
  
     def __init__(self, server, change_id, revision_id, user):
+        self.server = server
         self.change_id = change_id
         self.revision_id = revision_id
         self.auth = HTTPBasicAuth(user['username'], user['password'])
-        self.rest = GerritRestAPI(url=server, auth=self.auth)
+        self.rest = GerritRestAPI(url=self.server, auth=self.auth)
     
     def get_tests(self):
         unfiltered_data = GerritRepository.get_unfiltered_diff_data(self)
         filter = Filter()
-        filtered_data = filter.filter_data(unfiltered_data)
+        filtered_data = filter.remove_prefixes(filter.remove_non_test_data(unfiltered_data))
 
-        test_structure_getter = TestStructureGetter()
+        test_structure_getter = Filter()
         tests = test_structure_getter.get_structurized_tests_from_data(filtered_data)
 
         return tests
@@ -29,6 +30,13 @@ class GerritRepository(Repository):
         response = self.rest.get(endpoint)
 
         return response
+    
+    def get_repo(self):
+        endpoint = f"/changes/{self.change_id}/revisions/{self.revision_id}/review"
+        response = self.rest.get(endpoint)
+
+        repo = response.get('project')
+        return repo
 
     def get_file_diff(self, file_path):
         encoded_file_path = urllib.parse.quote(file_path, safe='')
@@ -58,12 +66,5 @@ class GerritRepository(Repository):
             print(f"An error occurred: {e}")
             sys.exit()
         return unfiltered_data
-    
-    def get_repo(self):
-        endpoint = f"/changes/{self.change_id}/revisions/{self.revision_id}/review"
-        response = self.rest.get(endpoint)
-
-        repo = response.get('project')
-        return repo
        
 

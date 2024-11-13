@@ -4,4 +4,4 @@ __pycache__/
 *.spec
 build/
 dist/
-*test_data.py
+*test_data.json

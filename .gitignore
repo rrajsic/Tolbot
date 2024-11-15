@@ -3,5 +3,4 @@ __pycache__/
 *.docx
 *.spec
 build/
-dist/
 *test_data.json

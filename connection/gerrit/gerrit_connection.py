@@ -12,7 +12,7 @@ class GerritConnection(Connection):
     def __init__(self, user):
         self.user = user
         self.auth = HTTPBasicAuth(user['username'], user['password'])
-        self.rest = GerritRestAPI(url='***REMOVED***', auth=self.auth)
+        self.rest = GerritRestAPI(url='https://gerrit.ericsson.se/', auth=self.auth)
 
     def connect(self):
         try:

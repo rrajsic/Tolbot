@@ -58,10 +58,12 @@ Before using Tolbot make sure you have a commit which follows these rules for te
 ```
 ## How to use
 1. Configure the servers which will be used in the `servers_config.json` ex. _https://gerrit-review.googlesource.com/_
-2. Start Tolbot.exe
+2. Start Tolbot.exe (located in dist/ folder)
 3. Log in with your credentials.
 4. Fill necessary informations such as team name, project name, Change ID and Revision ID (patchset hash value) for up to 3 branches/repo-s
 5. Press export when ready, TOL is saved with name "<project_name>_TOL.docx"
+
+> For developing/debugging build project with `python -m source`
    
 ## Example of a generated TOL MS Word file
 ![Example 1](https://github.com/user-attachments/assets/13591d1d-ca88-443a-a855-4f731afe0042)

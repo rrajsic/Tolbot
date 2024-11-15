@@ -62,8 +62,20 @@ Before using Tolbot make sure you have a commit which follows these rules for te
 3. Log in with your credentials.
 4. Fill necessary informations such as team name, project name, Change ID and Revision ID (patchset hash value) for up to 3 branches/repo-s
 5. Press export when ready, TOL is saved with name "<project_name>_TOL.docx"
+   
 ## Example of a generated TOL MS Word file
 ![Example 1](https://github.com/user-attachments/assets/13591d1d-ca88-443a-a855-4f731afe0042)
 ![Example 2](https://github.com/user-attachments/assets/53a9e989-af21-4b38-99a3-dc7f0841d015)
+
+# Code Documentation
+## Class Diagram
+Below is the class diagram for the whole program
+![Class Diagram](https://github.com/user-attachments/assets/c38ab09d-e54b-40c5-aba7-b7650a16d1ea)
+
+New modules can be added in the appropriate folder. For example if you want to implement exporting to Excel, there should be a Excel class which inherits from Exporter class, and it should be located in `export` folder.
+
+## Sequence Diagram
+Below is the sequence diagram from start to finish
+![Sequence Diagram](https://github.com/user-attachments/assets/d0e2b742-56fa-459d-bca7-5aa456466f31)
 
 

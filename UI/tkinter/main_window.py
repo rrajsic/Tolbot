@@ -39,7 +39,7 @@ class TkinterUI(UI):
         self.team_name_entry = CTkEntry(self.root, font=("Arial", 16))
         self.team_name_entry.place(relx=0.45, rely=0.05, anchor='w')
 
-        self.project_name_label = CTkLabel(self.root, text="SP name:", font=("Arial", 16))
+        self.project_name_label = CTkLabel(self.root, text="Project name:", font=("Arial", 16))
         self.project_name_label.place(relx=0.3, rely=0.1, anchor='w')
 
         self.project_name_entry = CTkEntry(self.root, font=("Arial", 16))
@@ -72,9 +72,10 @@ class TkinterUI(UI):
         self.server_label_1 = CTkLabel(self.root, text="Server:", font=("Arial", 16))
         self.server_label_1.place(relx=0.15, rely=0.25, anchor='w')
 
-        self.server_entry[0] =  CTkComboBox(self.root, values=server_values, width = 300, font=("Arial", 14))
+        self.server_entry[0] = CTkComboBox(self.root, values=server_values, width = 300, font=("Arial", 14))
         if server_values:
             self.server_entry[0].set(server_values[0])
+
         self.server_entry[0].place(relx=0.3, rely=0.25, anchor='w')
 
         self.change_id_label_1 = CTkLabel(self.root, text="Change ID:", font=("Arial", 16))
@@ -103,6 +104,7 @@ class TkinterUI(UI):
         self.server_entry[1] = CTkComboBox(self.root, values=server_values,  width = 300, font=("Arial", 14))
         if server_values:
             self.server_entry[1].set(server_values[0])
+
         self.server_entry[1].place(relx=0.3, rely=0.5, anchor='w')
 
         self.change_id_label_2 = CTkLabel(self.root, text="Change ID:", font=("Arial", 16))
@@ -131,6 +133,7 @@ class TkinterUI(UI):
         self.server_entry[2] = CTkComboBox(self.root, values=server_values, width = 300, font=("Arial", 14))
         if server_values:
             self.server_entry[2].set(server_values[0])
+ 
         self.server_entry[2].place(relx=0.3, rely=0.75, anchor='w')
 
         self.change_id_label_3 = CTkLabel(self.root, text="Change ID:", font=("Arial", 16))

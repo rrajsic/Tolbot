@@ -1,6 +1,6 @@
 import tkinter as tk
 from customtkinter import *
-from connection.gerrit_connection import GerritConnection
+from connection.gerrit.gerrit_connection import GerritConnection
 
 class LoginUI:
     def __init__(self, root):

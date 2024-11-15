@@ -17,13 +17,9 @@ class GerritRepository(Repository):
     
     def get_tests(self):
         unfiltered_data = GerritRepository.get_unfiltered_diff_data(self)
+        
         filter = Filter()
-        filtered_data = filter.remove_prefixes(filter.remove_non_test_data(unfiltered_data))
-
-        test_structure_getter = Filter()
-        tests = test_structure_getter.get_structurized_tests_from_data(filtered_data)
-
-        return tests
+        return filter.filter(unfiltered_data)
 
     def get_change_files(self):
         endpoint = f"/changes/{self.change_id}/revisions/{self.revision_id}/files"

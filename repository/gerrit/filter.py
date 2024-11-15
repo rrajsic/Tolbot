@@ -2,6 +2,14 @@ import re
 
 class Filter:
 
+    def filter(self, unfiltered_data):
+        filtered_data = self.get_structurized_tests_from_data(
+            self.remove_prefixes(
+                self.remove_non_test_data(unfiltered_data)))
+
+        return filtered_data
+
+
     def get_structurized_tests_from_data(self, filtered_test_data):
         structurized_tests = []
         filtered_tests = self.split_test_data(filtered_test_data)

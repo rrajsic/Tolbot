@@ -1,23 +1,20 @@
-
 import backoff
 import requests
 from pygerrit2 import GerritRestAPI, HTTPBasicAuth
 from connection.connection import Connection
 
-@backoff.on_exception(backoff.expo, 
-                      requests.exceptions.ConnectionError,
-                      max_time=10)
 
+@backoff.on_exception(backoff.expo, requests.exceptions.ConnectionError, max_time=10)
 class GerritConnection(Connection):
-    def __init__(self, user):
+    def __init__(self, user, server):
         self.user = user
-        self.auth = HTTPBasicAuth(user['username'], user['password'])
-        self.rest = GerritRestAPI(url='https://gerrit.ericsson.se/', auth=self.auth)
+        self.auth = HTTPBasicAuth(user["username"], user["password"])
+        self.rest = GerritRestAPI(url=server, auth=self.auth)
 
     def connect(self):
         try:
-            response = self.rest.get('/config/server/version')
+            response = self.rest.get("/config/server/version")
             print("Authentication successful")
-            print(f"Gerrit server version: {response}")  
+            print(f"Gerrit server version: {response}")
         except Exception:
             raise
